@@ -1,0 +1,102 @@
+langfuse:
+  nextauth:
+    url: http://localhost:3000
+  additionalEnv:
+  # - name: DATABASE_URL
+  #   value: "postgresql://postgres:postgres@0.0.0.0:5432/langfuse"
+  - name: TELEMETRY_ENABLED
+    value: "true"
+  - name: LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES
+    value: "true"
+  - name: CLICKHOUSE_MIGRATION_URL
+    value: "clickhouse://langfuse-clickhouse:9000"
+  - name: CLICKHOUSE_URL
+    value: "http://langfuse-clickhouse:8123"
+  - name: CLICKHOUSE_USER
+    value: "clickhouse"
+  - name: CLICKHOUSE_PASSWORD
+    value: "clickhouse"
+  - name: CLICKHOUSE_CLUSTER_ENABLED
+    value: "false"
+  - name: LANGFUSE_S3_EVENT_UPLOAD_BUCKET
+    value: "langfuse"
+  - name: LANGFUSE_S3_EVENT_UPLOAD_REGION
+    value: "auto"
+  - name: LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID
+    value: "minio"
+  - name: LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY
+    value: "miniosecret"
+  - name: LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT
+    value: "http://0.0.0.0:9000"
+  - name: LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE
+    value: "true"
+  - name: LANGFUSE_S3_EVENT_UPLOAD_PREFIX
+    value: "events/"
+  - name: LANGFUSE_S3_MEDIA_UPLOAD_BUCKET
+    value: "langfuse"
+  - name: LANGFUSE_S3_MEDIA_UPLOAD_REGION
+    value: "auto"
+  - name: LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID
+    value: "minio"
+  - name: LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY
+    value: "miniosecret"
+  - name: LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT
+    value: "http://0.0.0.0:9000"
+  - name: LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE
+    value: "true"
+  - name: LANGFUSE_S3_MEDIA_UPLOAD_PREFIX
+    value: "media/"
+  - name: REDIS_CONNECTION_STRING
+    value: "redis://default:myredissecret@langfuse-valkey-primary:6379/0"
+  - name: REDIS_PORT
+    value: "6379"
+  - name: REDIS_AUTH
+    value: "myredissecret"
+  - name: REDIS_TLS_ENABLED
+    value: "false"
+  - name: REDIS_TLS_CA
+    value: "/certs/ca.crt"
+  - name: REDIS_TLS_CERT
+    value: "/certs/redis.crt"
+  - name: REDIS_TLS_KEY
+    value: "/certs/redis.key"
+  telemetryEnabled: true
+  persistence:
+    storageClass: local-path
+service:
+  type: ClusterIP
+  additionalLabels: []
+ingress:
+  enabled: false
+  annotations: []
+postgresql:
+  deploy: true
+  auth:
+    username: postgres
+    password: postgres
+    database: langfuse
+  persistence:
+    storageClass: local-path
+clickhouse:
+  deploy: true
+  auth: 
+    username: clickhouse
+    password: clickhouse
+    database: default
+  shards: 1
+minio:
+  deploy: true
+  auth:
+    rootUser: minio
+    rootPassword: miniosecret
+  persistence:
+    storageClass: local-path
+valkey:
+  deploy: true
+  architecture: standalone
+  host: localhost
+  primary:
+    extraFlags: 
+    - "--maxmemory-policy noeviction"
+  auth:
+    password: myredissecret
